@@ -9,3 +9,16 @@ This project aims to develop a portal which gather news articles from various so
 * Backend: Django
 * Data Scraping: Beautiful Soup
 * Sentiment Analysis: Natural Language Toolkit
+## Usage
+To run the News Sentiment Analysis Portal on local sever, follow these steps:
+
+  * Clone the repository: git clone https://github.com/your-username/News-Sentiment-Analysis.git
+  * Change to the project directory: cd News-Sentiment-Analysis\
+  * Install the required Python packages: pip install bootstrap
+  * Start the development server: python manage.py runserver
+  * Access the portal in your web browser at http://localhost:8000/
+    
+
+    
+   
+
