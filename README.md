@@ -12,8 +12,8 @@ This project aims to develop a portal which gather news articles from various so
 ## Usage
 To run the News Sentiment Analysis Portal on local sever, follow these steps:
 
-  * Clone the repository: git clone https://github.com/Ranishivi/News-Sentiment-Analysis.git
-  * Change to the project directory: cd News-Sentiment-Analysis\
+  * Clone the repository: ** git clone https://github.com/Ranishivi/News-Sentiment-Analysis.git **
+  * Change to the project directory: cd News-Sentiment-Analysis
   * Install the required Python packages: pip install bootstrap
   * Start the development server: python manage.py runserver
   * Access the portal in your web browser at http://localhost:8000/
