@@ -27,6 +27,7 @@ def stemming(content):
 
 
 def get_google_news(query, num_articles=20):
+
     url = f"https://news.google.com/search?q={query}"
     response = requests.get(url)
     
@@ -47,10 +48,12 @@ def get_google_news(query, num_articles=20):
     
     for idx, article in enumerate(articles, 1):
         title_tag = article.find('a', {'class': 'JtKRv'})
+    
         if title_tag:
             title = title_tag.get_text()
             link = 'https://news.google.com' + title_tag['href'][1:]
-
+            published_time = article.find("time", class_="hvbAAd").text
+            
             article_response = requests.get(link)
             if article_response.status_code != 200:
                 continue
@@ -64,13 +67,25 @@ def get_google_news(query, num_articles=20):
             news_metadata.append({
                 'title': title,
                 'link': link,
-                'article_text': article_text_stemmed[:300],
+                'article_text': article_text_stemmed[:200],
+                'time': published_time
             })
         else:
             print(f"Article {idx}: Title tag not found")
     
     return news_metadata
 
+
+def analyze_sentiment(article_text):
+    
+    blob = TextBlob(article_text)
+    polarity = blob.sentiment.polarity
+    if polarity > 0:
+        return "Positive"
+    elif polarity < 0:
+        return "Negative"
+    else:
+        return "Neutral"
 
 
 def result(request):
@@ -80,25 +95,12 @@ def result(request):
             news_data = get_google_news(key)
 
             news_info = []
-            l1 = []
-            l2 = []
-            l3 = []
-
+            
             for idx, news in enumerate(news_data, 1):
                 heading=news['article_text']
-                blob=TextBlob(heading)
-                a = blob.sentiment.polarity
-                if a > 0:
-                    senti = "Positive"
-                elif a < 0:
-                    senti = "Negative"
-                else:
-                    senti = "Neutral"
-                l1.append(news['title'])
-                l2.append(news['link'])
-                l3.append(senti)
+                senti=analyze_sentiment(heading)
+                news_info.append((news['time'], news['title'], news['link'], senti))
                 
-            news_info = zip(l1, l2, l3)
 
             context={'Headline':news_info}
 
