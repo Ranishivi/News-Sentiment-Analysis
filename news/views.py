@@ -13,6 +13,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+from concurrent.futures import ThreadPoolExecutor
 import time
 
 
@@ -75,28 +76,24 @@ def extract_article_data(driver, article):
         return None
     
 
-def get_google_news(query, num_articles=15):
+def get_google_news(query, num_articles=12):
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
+    
     search_url = f"https://news.google.com/search?q={query}"
     driver.get(search_url)
-    time.sleep(3)  # Allow time for the page to load
-
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, 'article')))
+    
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     articles = soup.find_all('article', limit=num_articles)
-
-    news_metadata = []
-
-    for idx, article in enumerate(articles, 1):
-        data = extract_article_data(driver, article)
-        if data:
-            news_metadata.append(data)
-
     driver.quit()
-    return news_metadata
+
+    with ThreadPoolExecutor(max_workers=15) as executor:
+        news_metadata = list(executor.map(extract_article_data, articles))
+
+    return [article for article in news_metadata if article]
 
 
 def result(request):
@@ -120,6 +117,9 @@ def result(request):
         
     else:
         return HttpResponse("Invalid request method", status=405)
+
+
+    
 
 
     
