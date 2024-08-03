@@ -15,13 +15,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from concurrent.futures import ThreadPoolExecutor
-import time
 
 
 def home(request):
     return render(request, 'news/home.html')
 
-port_stem = PorterStemmer()
+# Data Cleaning
+port_stem=PorterStemmer()
 def stemming(content):
     stemmed_content = re.sub('[^a-zA-Z]', ' ', str(content))
     stemmed_content = stemmed_content.lower()
@@ -29,7 +29,6 @@ def stemming(content):
     stemmed_content = [port_stem.stem(word) for word in stemmed_content if word not in stopwords.words('english')]
     stemmed_content = ' '.join(stemmed_content)
     return stemmed_content
-
 
 def analyze_sentiment(article_text):
     blob = TextBlob(article_text)
@@ -41,13 +40,11 @@ def analyze_sentiment(article_text):
     else:
         return "Neutral"
 
-
 def get_article_sentiment(link):
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    
     driver.get(link)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, 'p')))
     article_soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -72,30 +69,29 @@ def extract_article_data(article):
             return {
                 'title': title,
                 'link': link,
-                'published_time': published_time,
+                'time': published_time,
                 'sentiment': sentiment
             }
         else:
             print(f"Title tag not found")
     except Exception as e:
         return None
-    
+
 
 def get_google_news(query, num_articles=15):
-    options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    url = f"https://news.google.com/search?q={query}"
+    response = requests.get(url)
     
-    search_url = f"https://news.google.com/search?q={query}"
-    driver.get(search_url)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, 'article')))
+    if response.status_code != 200:
+        print(f"Failed to retrieve news articles: Status code {response.status_code}")
+        return []
     
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    
     articles = soup.find_all('article', limit=num_articles)
-    driver.quit()
 
-    with ThreadPoolExecutor(max_workers=15) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         news_metadata = list(executor.map(extract_article_data, articles))
 
     return [article for article in news_metadata if article]
@@ -122,6 +118,9 @@ def result(request):
         
     else:
         return HttpResponse("Invalid request method", status=405)
+
+
+    
 
 
     
