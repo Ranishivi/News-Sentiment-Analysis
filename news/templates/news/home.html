@@ -7,20 +7,31 @@
 <hr color="#205880">
 <br>
 <br>
+<div class="loader-container" id="loader-container">
+    <div class="loader"></div>
+    <div class="loading-text">Processing...</div>
+</div>
 <P> 
     <h4> Enter the text to get the sentiment: </h4>
     <div class="container">
-        <form method="POST" action="{% url 'result' %}">
+        <form id="myForm" method="POST" action="{% url 'result' %}">
             {% csrf_token %}
             <label for="Keywords" class="textbox-label">Enter a keyword:</label>
             <input type="text" id="Keywords" class="textbox" name="Keywords" placeholder="Enter Keyword here..." required>
             <button class="submit-button" onclick="submitResponse()">Submit</button>
         </form>
     </div>
-    
+
 </P>
+<script>
+    document.getElementById('myForm').onsubmit = function() {
+      document.getElementById('loader-container').style.display = 'flex';
+    };
+</script>
 <br>
-   <img src="{% static 'news/icons/faces.png' %}" alt="faces" height="200px">
+<br>
+<br>
+<img src="{% static 'news/icons/faces.png' %}" alt="faces" height="120px" align="right">
 </p>
 <p>
     
@@ -32,3 +43,4 @@
     </script>
     
 {% endblock content %}    
+   
