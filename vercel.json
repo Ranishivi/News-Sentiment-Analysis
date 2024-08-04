@@ -1,8 +1,8 @@
 
 {
   "builds" : [{
-    "src": "news_sentiments/wsgi.py",
-    "use": "@vercel/python",
+    "src": "build.sh",
+    "use": "@vercel/static-build",
     "config": { "maxLambdaSize": "15mb", "runtime": "python3.9"}
   }],
   "routes": [
