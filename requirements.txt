@@ -28,6 +28,7 @@ comm==0.2.2
 confection==0.1.5
 contourpy==1.2.1
 crispy-bootstrap4==2024.1
+cryptography==3.4.7 
 cycler==0.12.1
 cymem==2.0.8
 dacite==1.8.1
