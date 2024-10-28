@@ -1,0 +1,7 @@
+Django>=3.2
+requests>=2.25
+beautifulsoup4>=4.9
+textblob>=0.15
+nltk>=3.5
+selenium>=3.141
+webdriver-manager>=3.4.2
